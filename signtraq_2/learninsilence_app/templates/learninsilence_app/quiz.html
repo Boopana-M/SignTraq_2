@@ -1,0 +1,153 @@
+{% extends 'learninsilence_app/base.html' %}
+
+{% block title %}Quiz - SignTraq{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <h1 class="page-title" style="color: #ff8c00;">Indian Sign Language (ISL) Quiz</h1>
+    <hr class="title-underline">
+
+    <div class="quiz-progress">
+        <p id="progress-text">Progress: 0/0</p>
+    </div>
+
+    <div class="question-card" id="question-card" style="display:none;">
+        <h2 id="question-number"></h2>
+        <p>What does this ISL sign mean?</p>
+        <div class="question-image">
+            <img id="question-image" src="#" alt="ISL Sign Image">
+        </div>
+        <div class="options" id="options-container">
+            <!-- Option buttons will be inserted here -->
+        </div>
+    </div>
+
+    <div class="button-container" style="text-align: center; margin-top: 30px;">
+        <button class="next-button" id="next-button" style="display:none;">Next Question</button>
+    </div>
+
+    <div id="result-card" class="question-card" style="display:none;">
+        <h2>Quiz Complete!</h2>
+        <p id="score-text"></p>
+        <button onclick="window.location.reload()" class="next-button">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function showQuestion(idx) {
+    const q = questions[idx];
+    document.getElementById('question-card').style.display = '';
+    document.getElementById('result-card').style.display = 'none';
+    document.getElementById('question-number').textContent = `Question ${idx + 1}`;
+    document.getElementById('question-image').src = q.image_url;
+    document.getElementById('progress-text').textContent = `Progress: ${idx + 1}/${questions.length}`;
+    const optionsDiv = document.getElementById('options-container');
+    optionsDiv.innerHTML = '';
+    q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-button';
+        btn.textContent = option;
+        btn.onclick = () => selectOption(btn, option, q.correct_answer);
+        optionsDiv.appendChild(btn);
+    });
+    document.getElementById('next-button').style.display = 'none';
+}
+
+function selectOption(btn, selected, correct) {
+    const optionButtons = document.querySelectorAll('.option-button');
+    optionButtons.forEach(b => b.disabled = true);
+    if (selected === correct) {
+        btn.style.backgroundColor = '#4CAF50';
+        score++;
+    } else {
+        btn.style.backgroundColor = '#dc3545';
+        optionButtons.forEach(b => {
+            if (b.textContent === correct) b.style.backgroundColor = '#4CAF50';
+        });
+        score = Math.max(0, score - 1);
+    }
+    document.getElementById('next-button').style.display = '';
+}
+
+document.getElementById('next-button').onclick = function() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion(currentQuestion);
+    } else {
+        showResult();
+    }
+};
+
+function showResult() {
+    document.getElementById('question-card').style.display = 'none';
+    document.getElementById('result-card').style.display = '';
+    document.getElementById('score-text').textContent = `Your score: ${score} / ${questions.length}`;
+    document.getElementById('progress-text').textContent = 'Quiz Complete!';
+
+    // Send score to backend
+    const csrfToken = getCookie('csrftoken');
+    fetch('/api/save-quiz-result/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ score: score })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Score saved successfully:', data);
+        // Handle success response if needed
+    })
+    .catch((error) => {
+        console.error('Error saving score:', error);
+        // Handle error if needed
+    });
+}
+
+// Fetch questions from backend
+fetch('/api/quiz-questions/')
+    .then(res => res.json())
+    .then(data => {
+        questions = data.questions;
+        currentQuestion = 0;
+        score = 0;
+        if (questions.length > 0) {
+            showQuestion(0);
+        } else {
+            document.getElementById('progress-text').textContent = 'No quiz questions found.';
+        }
+    })
+    .catch(err => {
+        document.getElementById('progress-text').textContent = 'Error loading quiz.';
+    });
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

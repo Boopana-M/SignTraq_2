@@ -1,0 +1,4 @@
+SpeechRecognition==3.10.0
+opencv-python==4.8.1.78
+PyAudio==0.2.13
+numpy==1.24.3 

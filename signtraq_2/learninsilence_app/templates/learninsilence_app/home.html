@@ -1,0 +1,29 @@
+{% extends 'learninsilence_app/base.html' %}
+
+{% block title %}Home - SignTraq{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <h1 class="centered-heading"></h1>
+    <p style="text-align: center; color: #fff; font-size: 1.2rem;">Your comprehensive platform for learning sign language, accessing resources, and connecting with the community.</p>
+
+    <div class="cards-container">
+        <div class="card">
+            
+            <h3>Quiz</h3>
+            <p>Engage with interactive quizzes to test your sign language knowledge.</p>
+            <a href="{% url 'quiz' %}"><button>Start Quiz</button></a>
+        </div>
+        <div class="card">
+          
+            <h3>Converter</h3>
+            <p>Convert speech or text to Indian Sign Language animations.</p>
+            <a href="{% url 'converter' %}"><button>Use Converter</button></a>
+        </div>
+    </div>
+
+
+  
+
+</div>
+{% endblock %} 

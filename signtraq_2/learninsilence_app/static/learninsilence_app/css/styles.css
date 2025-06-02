@@ -1,0 +1,239 @@
+/* REMADE CSS: Centered and Cleaned Up */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    font-family: sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    min-height: 100vh; /* Ensure body is at least viewport height */
+    background-image: url('/static/learninsilence_app/images/bbgg.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: #f5f5f5; /* Fallback */
+    /* Removed display: flex and related properties - body is a standard block container */
+}
+
+/* Assuming no sidebar is present in the final layout based on the last image/CSS */
+/* If a sidebar is needed, the wrapper structure from the user's last CSS might be necessary */
+/* .wrapper { ... } */
+/* .sidebar { ... } */
+/* .main-content { ... } */
+
+/* Applying ONLY horizontal centering to your existing main containers */
+.main-center, .home-container, .quiz-container {
+    display: flex; /* Keep flex for internal layout */
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to top within container */
+    align-items: center; /* Horizontally center content within container */
+    padding: 20px; /* Internal padding */
+    width: 100%; /* Take full width up to max-width */
+    max-width: 1200px; /* Limit overall width */
+    margin-left: auto; /* **Horizontally center the container block** */
+    margin-right: auto; /* **Horizontally center the container block** */
+    margin-top: 40px; /* Add top margin */
+    margin-bottom: 40px; /* Add bottom margin */
+    box-sizing: border-box;
+    /* Removed temporary debug border */
+}
+
+.converter-container {
+    display: flex; /* Keep flex for internal layout */
+    flex-direction: column;
+    justify-content: center; /* Center content vertically within container */
+    align-items: center; /* Horizontally center content within container */
+    padding: 20px; /* Internal padding */
+    width: 100%; /* Take full width up to max-width */
+    max-width: 1200px; /* Limit overall width */
+    margin-left: auto; /* **Horizontally center the container block** */
+    margin-right: auto; /* **Horizontally center the container block** */
+    margin-top: 40px; /* Add top margin */
+    margin-bottom: 40px; /* Add bottom margin */
+    box-sizing: border-box;
+    /* Removed temporary debug border */
+}
+
+.home-container {
+    margin-top: 40px; /* Ensure top margin for home page */
+    margin-bottom: 40px; /* Ensure bottom margin for spacing */
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 40px;
+    padding: 0;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 40px;
+    margin-left: 0px;
+    margin-right: 100px;
+}
+
+.cards-container .card {
+    max-width: 400px;
+    width: 100%;
+}
+
+h1, h2, h3, .page-title, .page-description {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-title {
+    margin-bottom: 20px;
+    color: #ff8c00;
+}
+
+.page-description {
+    margin-bottom: 40px;
+    max-width: 800px;
+    padding: 0 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button {
+    background-color: #ff8c00;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Card Styles (for Home, Quiz, Converter) */
+.card, .question-card, .converter-section {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 16px;
+    box-shadow: 0 4px 2px rgba(0,0,0,0.15);
+    padding: 20px 15px; /* Reduced padding */
+    margin: 30px auto; /* Center cards/sections horizontally */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontally center content within cards */
+    width: 500px; /* Increased base width to make it larger */
+    max-width: 95vw; /* Keep responsive max-width */
+    /* aspect-ratio: 1 / 1; Removed aspect ratio to allow height to adjust based on content */
+    text-align: center;
+    justify-content: center; /* Center content vertically within the card */
+    min-height: 200px; /* Ensure a minimum height for a rectangular shape */
+}
+
+.title-underline {
+    border: 1px solid #ff8c00;
+    width: 50%;
+    margin: 20px auto;
+}
+
+.quiz-progress {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.question-image img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.question-card .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+}
+
+.option-button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.option-button:hover {
+    background-color: #eee;
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.next-button {
+    font-size: 1.1em;
+}
+
+/* Converter Page Specific Styles */
+.converter-section:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.speech-input-section, .video-output-section {
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: red;
+}
+
+.centered-heading[style] {
+    margin-top: 80px !important;
+}
+
+.centered-image {
+    margin-top: 40px;
+}
+
+
+@media (max-width: 900px) {
+    .cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .cards-container .card {
+        max-width: 90vw;
+    }
+    .quiz-container, .converter-container {
+        max-width: 98vw;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        background-size: cover;
+        background-position: top center;
+    }
+    .card, .question-card, .converter-section {
+        width: 98vw;
+        padding: 16px 4px;
+    }
+}

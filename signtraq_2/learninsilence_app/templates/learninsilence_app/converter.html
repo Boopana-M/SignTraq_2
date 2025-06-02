@@ -1,0 +1,397 @@
+{% extends 'learninsilence_app/base.html' %}
+
+{% block title %}Converter - SignTraq{% endblock %}
+
+{% block content %}
+<div class="converter-container">
+    <h1 class="page-title">Indian Sign Language (ISL) Converter</h1>
+
+    <div class="converter-section">
+        <h2>From Speech</h2>
+        <p class="section-description">Click "Start Recording", speak, and see the transcription with its ISL visual.</p>
+
+        <div class="speech-input-section">
+            <div class="language-selector">
+                <label for="language-select">Spoken Language</label>
+                <select id="language-select" class="custom-select">
+                    <option value="en-IN">English (India)</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button id="start-recording" class="btn btn-primary">
+                    <i class="fas fa-microphone"></i> Start Recording
+                </button>
+                <button id="check-microphone-permission" class="btn btn-secondary">
+                    <i class="fas fa-cog"></i> Check Microphone
+                </button>
+            </div>
+            <div class="recognized-text-container">
+                <p>Recognized Text: <span id="recognized-text" class="highlight-text"></span></p>
+            </div>
+        </div>
+
+        <div class="video-output-section">
+            <h3>Sign Language Output</h3>
+            <div class="video-container">
+                <div id="video-placeholder" style="display:block; color:#aaa; text-align:center;">
+                    <i class="fas fa-video" style="font-size:2rem;"></i>
+                    <div>Sign language video will appear here</div>
+                </div>
+                <video id="sign-video" controls width="640" height="360" style="display:none;"></video>
+                <div id="no-match-message" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span class="error-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Base styles */
+.converter-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-title {
+    color: #ff8c00;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-description {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Section styling */
+.converter-section {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.converter-section:hover {
+    transform: translateY(-2px);
+}
+
+/* Language selector */
+.language-selector {
+    margin-bottom: 1.5rem;
+}
+
+.custom-select {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 200px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.custom-select:focus {
+    border-color: #ff8c00;
+    outline: none;
+}
+
+/* Button styling */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn i {
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background-color: #ff8c00;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #e67e00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Recognized text styling */
+.recognized-text-container {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.highlight-text {
+    font-weight: 600;
+    color: #ff8c00;
+    font-size: 1.1rem;
+    padding: 5px 10px;
+    background-color: rgba(255, 140, 0, 0.1);
+    border-radius: 4px;
+}
+
+/* Video container styling */
+.video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 360px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 20px;
+    padding: 20px;
+    position: relative;
+}
+
+#sign-video {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+/* Error message styling */
+.error-message {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    background-color: #fff3f3;
+    border-radius: 8px;
+    border: 1px solid #ffcdd2;
+    color: #dc3545;
+    font-weight: 500;
+    width: 100%;
+}
+
+.error-message i {
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #dc3545;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .converter-container {
+        padding: 15px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .video-container {
+        min-height: 280px;
+    }
+
+    #sign-video {
+        width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .converter-section {
+        padding: 15px;
+    }
+
+    .custom-select {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+    const startRecordingButton = document.getElementById('start-recording');
+    const checkPermissionButton = document.getElementById('check-microphone-permission');
+    const recognizedTextSpan = document.getElementById('recognized-text');
+    const signVideo = document.getElementById('sign-video');
+    const noMatchMessage = document.getElementById('no-match-message');
+    const errorText = noMatchMessage.querySelector('.error-text');
+    const videoPlaceholder = document.getElementById('video-placeholder');
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        errorText.textContent = 'Web Speech API is not supported in this browser. Please try Chrome or Edge.';
+        noMatchMessage.style.display = 'block';
+        startRecordingButton.disabled = true;
+        checkPermissionButton.disabled = true;
+    } else {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = document.getElementById('language-select').value;
+
+        startRecordingButton.addEventListener('click', () => {
+            recognizedTextSpan.textContent = '';
+            signVideo.style.display = 'none';
+            videoPlaceholder.style.display = 'block';
+            noMatchMessage.style.display = 'none';
+            signVideo.pause();
+            signVideo.removeAttribute('src');
+            recognition.start();
+            startRecordingButton.textContent = 'Listening...';
+            startRecordingButton.disabled = true;
+        });
+
+        recognition.onresult = (event) => {
+            const spokenText = event.results[0][0].transcript;
+            recognizedTextSpan.textContent = spokenText;
+            startRecordingButton.textContent = 'Start Recording';
+            startRecordingButton.disabled = false;
+            sendTextToBackend(spokenText);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            errorText.textContent = `Error during speech recognition: ${event.error}`;
+            noMatchMessage.style.display = 'block';
+            startRecordingButton.textContent = 'Start Recording';
+            startRecordingButton.disabled = false;
+            signVideo.style.display = 'none';
+            signVideo.pause();
+            signVideo.removeAttribute('src');
+            videoPlaceholder.style.display = 'block';
+        };
+
+        recognition.onend = () => {
+            startRecordingButton.textContent = 'Start Recording';
+            startRecordingButton.disabled = false;
+        };
+
+        function sendTextToBackend(text) {
+            const converterUrl = "{% url 'converter' %}";
+            fetch(converterUrl, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ spoken_text: text })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.video_path) {
+                    signVideo.src = data.video_path;
+                    signVideo.style.display = 'block';
+                    videoPlaceholder.style.display = 'none';
+                    noMatchMessage.style.display = 'none';
+                    signVideo.load();
+                    signVideo.oncanplay = () => {
+                        signVideo.play().catch(error => {
+                            console.error('Error playing video:', error);
+                            errorText.textContent = 'Error playing video. Please try again.';
+                            noMatchMessage.style.display = 'block';
+                        });
+                    };
+                } else {
+                    signVideo.style.display = 'none';
+                    signVideo.pause();
+                    signVideo.removeAttribute('src');
+                    videoPlaceholder.style.display = 'block';
+                    errorText.textContent = data.message || 'No matching sign video found.';
+                    noMatchMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error sending text to backend:', error);
+                errorText.textContent = 'Error communicating with the server. Please try again.';
+                noMatchMessage.style.display = 'block';
+                signVideo.style.display = 'none';
+                signVideo.pause();
+                signVideo.removeAttribute('src');
+                videoPlaceholder.style.display = 'block';
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        checkPermissionButton.addEventListener('click', () => {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(() => {
+                    alert('Microphone access granted.');
+                })
+                .catch(err => {
+                    console.error('Microphone access denied:', err);
+                    alert('Microphone access denied. Please allow microphone access in your browser settings.');
+                });
+        });
+    }
+</script>
+{% endblock %} 
